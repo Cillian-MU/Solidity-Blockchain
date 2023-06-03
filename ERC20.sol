@@ -11,22 +11,47 @@ contract ERC20 {
     uint8 immutable public decimals;
     uint256 public totalSupply;
 
+    address public owner;
+
     mapping (address => uint256) public balanceOf;
 
     mapping (address => mapping (address => uint256)) public allowance;
 
-    constructor(string memory _name, string memory _symbol, uint8 _decimals) {
+    constructor(address _owner, string memory _name, string memory _symbol, uint8 _decimals) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
+
+        owner = _owner;
     }
 
     function transfer(address to, uint256 value) external returns (bool) {
         return _transfer(msg.sender, to, value);
     }
 
-    function giveMeOneToken() public {
-        balanceOf[msg.sender] += 1e18;
+    function _mint(address to, uint256 value) private {
+        balanceOf[to] += value;
+        totalSupply += value;
+
+        emit Transfer(address(0), to, value);
+    }
+
+    function mint(address to, uint256 value) external {
+        require(msg.sender == owner);
+        _mint(to, value);
+    }
+
+    //burns token from a address and removes it from supply
+    function _burn(address from, uint256 value) private {
+        balanceOf[from] -= value;
+        totalSupply -= value;
+
+        emit Transfer(from, address(0), value);
+    }
+
+    function burn(address from, uint256 value) external {
+        require(msg.sender == owner);
+        _burn(from, value);
     }
 
     function transferFrom(address from, address to, uint256 value) external returns (bool) {
