@@ -3,6 +3,11 @@
 pragma solidity 0.8.19;
 
 contract ERC20 {
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -36,8 +41,8 @@ contract ERC20 {
         emit Transfer(address(0), to, value);
     }
 
-    function mint(address to, uint256 value) external {
-        require(msg.sender == owner);
+    function mint(address to, uint256 value) external onlyOwner {
+
         _mint(to, value);
     }
 
@@ -49,8 +54,7 @@ contract ERC20 {
         emit Transfer(from, address(0), value);
     }
 
-    function burn(address from, uint256 value) external {
-        require(msg.sender == owner);
+    function burn(address from, uint256 value) external onlyOwner {
         _burn(from, value);
     }
 
